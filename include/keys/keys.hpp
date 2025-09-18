@@ -1,12 +1,11 @@
 #pragma once
 
-#include <functional> // for std::hash
+#include <functional>  // for std::hash
 #include <tuple>
 #include <type_traits>
 
-namespace member {
+namespace keys {
 
-// -------------------- Utility --------------------
 namespace internal {
 
 template <typename T, typename MemberPtr>
@@ -26,7 +25,6 @@ constexpr void CombineHashes(std::size_t& seed, const T& data) {
 
 }  // namespace internal
 
-// -------------------- Comparisons --------------------
 template <auto... Members>
 struct Less {
     template <typename T>
@@ -110,14 +108,13 @@ struct NotEqual {
     }
 };
 
-// -------------------- Hash --------------------
 template <auto... Members>
 struct Hash {
     template <typename T>
     constexpr std::size_t operator()(T&& t) const {
         std::size_t seed = 0;
         if constexpr (sizeof...(Members) == 0) {
-            internal::CombineHashes(seed, t);
+            internal::CombineHashes(seed, t); // 0 members -- compute whole hash
         } else {
             (internal::CombineHashes(seed, internal::Access(t, Members)), ...);
         }
@@ -125,4 +122,4 @@ struct Hash {
     }
 };
 
-}  // namespace member
+}  // namespace keys
